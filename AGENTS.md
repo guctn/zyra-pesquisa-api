@@ -39,3 +39,18 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Convenções deste projeto
+- Não altere arquivos fora do escopo pedido. Explique cada alteração.
+- Componentes ficam em `components/`, um arquivo por componente.
+- Estado nunca é modificado no lugar: sempre gere um novo valor.
+- Valores que podem ser calculados a partir do estado não viram estado.
+- Antes de usar um pacote, confirme na documentação se ele funciona no Expo Go.
+
+## Contexto desta prova de conceito
+- TCC: ZYRA, app assistente de vestuário para pessoas com daltonismo que sugere looks com as peças do usuário.
+- Problema: listar, salvar e apagar looks na API do ZYRA mantendo a lista atualizada e tratando o back fora do ar.
+- Tecnologia investigada: @tanstack/react-query.
+- Uma tela só, em `App.tsx`: o usuário vê a lista de looks salvos, salva um look novo e apaga um look; quando o back cai, vê uma mensagem de erro e a última lista carregada.
+- Não usar Expo Router, a menos que a tecnologia investigada seja a navegação.
+- Fora de escopo: login, design final e tudo que não demonstre a pergunta.
