@@ -51,6 +51,7 @@ Docs: https://docs.expo.dev/eas/index.md
 - TCC: ZYRA, app assistente de vestuário para pessoas com daltonismo que sugere looks com as peças do usuário.
 - Problema: listar, salvar e apagar looks na API do ZYRA mantendo a lista atualizada e tratando o back fora do ar.
 - Tecnologia investigada: @tanstack/react-query.
-- Uma tela só, em `App.tsx`: o usuário vê a lista de looks salvos, salva um look novo e apaga um look; quando o back cai, vê uma mensagem de erro e a última lista carregada.
+- Uma tela só, em `App.tsx`: o usuário vê as peças do armário (`GET /pecas`) e a lista de looks salvos (`GET /looks`), toca em peças para montar e salvar um look novo (`POST /looks`) e apaga um look (`DELETE /looks/:id`); quando o back cai, vê uma mensagem de erro e a última lista carregada.
+- A URL do back e o token de acesso vêm de `EXPO_PUBLIC_API_URL` e `EXPO_PUBLIC_API_TOKEN`, definidas em `.env.local` (fora do Git); as rotas de looks exigem o cabeçalho `Authorization: Bearer <token>`.
 - Não usar Expo Router, a menos que a tecnologia investigada seja a navegação.
 - Fora de escopo: login, design final e tudo que não demonstre a pergunta.

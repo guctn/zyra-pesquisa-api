@@ -35,7 +35,24 @@ Descoberta: "back fora do ar" não é "celular sem internet". O NetInfo e o `onl
 - Expo — Network (https://docs.expo.dev/versions/latest/sdk/network/)
 - Expo — NetInfo (https://docs.expo.dev/versions/latest/sdk/netinfo/)
 - Expo — Using Model Context Protocol (MCP) with Expo (https://docs.expo.dev/eas/ai/mcp/)
+- Expo — Environment variables in Expo (https://docs.expo.dev/guides/environment-variables/)
 - React Native Directory — @tanstack/react-query com filtro "Works with Expo Go" (https://reactnative.directory/packages?search=%40tanstack%2Freact-query&expoGo=true)
+
+## API do ZYRA usada pela PoC
+Conferido no código do back (`src/auth` e `src/looks`) e testado com `curl` no back rodando localmente.
+
+- Autenticação: `POST /auth/login` com `{ email, password }` devolve `{ accessToken, idToken, refreshToken, expiresIn, tokenType }`. O access token dura 3600 s (1 hora). As rotas de looks exigem `Authorization: Bearer <accessToken>`; sem token ou com token inválido/vencido respondem 401.
+- `GET /looks`: lista os looks do usuário, do mais recente para o mais antigo. Cada look tem `{ id, nome, ocasiao, criadoEm, pecas }`.
+- `POST /looks`: corpo com `pecaIds` (obrigatório, 1 a 6 IDs de peças do próprio armário), `nome` (até 60 caracteres), `pedido` e `ocasiao` (opcionais). Responde 201 com o look salvo, que passa a ser o primeiro da lista.
+  - Mesmas peças de um look já salvo: devolve o look existente, sem criar cópia.
+  - Campo que não existe no corpo: 400 ("property titulo should not exist").
+  - `pecaIds` vazio: 400. Peça que não é do usuário: 404.
+  - Sem `nome` e com `pedido`, o back gera o título com a OpenAI.
+- `DELETE /looks/:id`: 200 `{ "message": "Look removido." }`. Id que não é UUID: 400. Look inexistente ou de outra pessoa: 404. Apagar um look não apaga as peças.
+- As peças do usuário vêm de `GET /pecas` (cada uma com `id`, `categoria`, `corNome`, `hex`, `colorAddSymbol`, `imagemMiniUrl`…).
+- O back escuta na porta 3000; o celular acessa pelo IP do Mac na mesma rede, que muda conforme a rede.
+
+Limitação para a demonstração: o token vence em 1 hora, então é preciso gerar um novo pouco antes de apresentar.
 
 ## Verificação do agente (exercício 6)
 Copilot em modo Agent no VS Code, modelo escolhido automaticamente: GPT-6 Luna. Servidor MCP do Expo conectado (56 ferramentas).
