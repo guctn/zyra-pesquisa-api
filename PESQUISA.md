@@ -63,7 +63,7 @@ Copilot em modo Agent no VS Code, modelo escolhido automaticamente: GPT-6 Luna. 
 Observações:
 - A busca do Expo (consulta "@tanstack/react-query React Query TanStack Query documentation") devolveu só páginas do Expo sem relação (MCP, Expo Router, skills, navegação). A documentação do Expo não cobre o TanStack Query, que tem site próprio.
 - A página do Expo sobre MCP (https://docs.expo.dev/eas/ai/mcp/) diz que a busca na documentação "requires an Expo Services paid plan", mas a busca funcionou com a minha conta gratuita.
-- [conferir: qual endereço a ferramenta "Read Expo Documentation Page" leu]
+- A ferramenta "Read Expo Documentation Page" não se limita ao site do Expo: no pedido do plano de implementação, ela leu páginas do tanstack.com (Mutations, Query Invalidation e Query Retries).
 
 ## Onde a IA errou
 
@@ -102,6 +102,18 @@ Observações:
 - O que veio: a palavra "નોંધ" (gujarati, "nota") no meio do texto em português.
 - Como percebi: leitura da resposta.
 - O certo: a resposta inteira deveria estar em português.
+
+### 7. Copilot ignorou a convenção de componentes do AGENTS.md
+- Pedido: implementar só o primeiro critério (listar peças e looks).
+- O que veio: os componentes `QueryStatus` e `ListsScreen` escritos dentro do `App.tsx`, sem a pasta `components/`.
+- Como percebi: lendo o diff e comparando com o `AGENTS.md`, que diz "Componentes ficam em `components/`, um arquivo por componente".
+- O certo: um arquivo por componente em `components/`. Depois de eu apontar, ele criou `PieceList.tsx`, `SavedLookList.tsx` e `QueryStatus.tsx`.
+
+### 8. Copilot alterou arquivos fora do pedido
+- Pedido: o mesmo do item 7.
+- O que veio: depois de rodar `npx expo lint`, ele desinstalou o ESLint que o próprio comando tinha configurado (deixando `eslint.config.js` e o script `lint` para trás) e moveu o `QueryClientProvider` para o `index.ts`, que ninguém pediu para mudar.
+- Como percebi: `git status` e `git diff` mostraram `index.ts` alterado e o ESLint sumindo do `package.json`.
+- O certo: o `AGENTS.md` manda rodar `npx expo lint` antes de terminar, então o ESLint precisa ficar; e o pedido não envolvia o `index.ts`. Depois de eu apontar, ele reinstalou o ESLint e restaurou o `index.ts`.
 
 ## Resultado e próximos passos no TCC
 - [o que a prova de conceito demonstrou e o que muda no TCC]
