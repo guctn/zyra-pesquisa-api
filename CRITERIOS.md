@@ -5,7 +5,7 @@
 - [x] Ao tocar em "Apagar" em um look, ele some de "Looks salvos" sem puxar para atualizar nem fechar o app, e as peças dele continuam em "Minhas peças".
 - [x] Ao tocar em "Salvar look" sem nenhuma peça escolhida, aparece a mensagem "Escolha pelo menos uma peça" e a lista de looks não muda.
 - [x] Com o back desligado, ao puxar "Looks salvos" para atualizar, aparece uma mensagem de erro em até 15 segundos e a última lista carregada continua na tela.
-- [x] Com o back desligado, ao tentar salvar ou apagar um look, aparece uma mensagem dizendo que a operação não foi concluída e a lista continua igual; depois de religar o back e puxar para atualizar, a lista volta a carregar sem fechar o app.
+- [x] Com o back desligado, ao tentar salvar ou apagar um look, aparece uma mensagem dizendo que a operação não foi concluída e a lista continua igual. Depois de religar o back e puxar para atualizar, a lista volta a carregar sem fechar o app.
 
-**Verificado em:** ( ) aparelho físico ( ) emulador
-**Resultado:** ( ) passou ( ) reprovou
+**Verificado em:** (x) aparelho físico (iPhone, Expo Go) ( ) emulador
+**Resultado:** (x) passou ( ) reprovou
