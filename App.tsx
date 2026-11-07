@@ -7,7 +7,14 @@ import {
 } from '@tanstack/react-query';
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import PieceList, { type Piece } from './components/PieceList';
 import QueryStatus from './components/QueryStatus';
 import SavedLookList, { type SavedLook } from './components/SavedLookList';
@@ -18,7 +25,12 @@ const apiToken = process.env.EXPO_PUBLIC_API_TOKEN;
 
 async function requestApi<T>(
   path: string,
-  options: { method?: 'POST' | 'DELETE'; body?: unknown } = {},
+  options: {
+    method?: 'POST' | 'DELETE';
+    body?: unknown;
+    signal?: AbortSignal;
+    timeoutMs?: number;
+  } = {},
 ): Promise<T> {
   if (!apiUrl) {
     throw new Error('Defina EXPO_PUBLIC_API_URL em .env.local.');
@@ -28,15 +40,46 @@ async function requestApi<T>(
     throw new Error('Defina EXPO_PUBLIC_API_TOKEN em .env.local.');
   }
 
-  const response = await fetch(`${apiUrl.replace(/\/+$/, '')}${path}`, {
-    method: options.method,
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${apiToken}`,
-      ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
-    },
-    ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
-  });
+  const controller = new AbortController();
+  const abortForQuery = () => controller.abort();
+  options.signal?.addEventListener('abort', abortForQuery);
+  let timedOut = false;
+  const timeoutId =
+    options.timeoutMs === undefined
+      ? undefined
+      : setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, options.timeoutMs);
+
+  let response: Response;
+  try {
+    response = await fetch(`${apiUrl.replace(/\/+$/, '')}${path}`, {
+      method: options.method,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${apiToken}`,
+        ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      },
+      ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (timedOut) {
+      throw new Error('A solicitação demorou demais. Tente atualizar novamente.');
+    }
+
+    if (!options.signal?.aborted) {
+      throw new Error('Não foi possível conectar ao servidor. Tente novamente.');
+    }
+
+    throw error;
+  } finally {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+    options.signal?.removeEventListener('abort', abortForQuery);
+  }
 
   if (!response.ok) {
     throw new Error(`A solicitação falhou (HTTP ${response.status}).`);
@@ -63,7 +106,10 @@ function ListsScreen() {
   });
   const looksQuery = useQuery({
     queryKey: ['looks'],
-    queryFn: () => requestApi<SavedLook[]>('/looks'),
+    queryFn: ({ signal }) =>
+      requestApi<SavedLook[]>('/looks', { signal, timeoutMs: 3000 }),
+    retry: 2,
+    retryDelay: (attemptIndex) => 500 * 2 ** attemptIndex,
   });
   const saveLookMutation = useMutation({
     mutationFn: (pecaIds: string[]) =>
@@ -112,7 +158,19 @@ function ListsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={looksQuery.isRefetching}
+            onRefresh={() => {
+              void looksQuery.refetch();
+            }}
+            tintColor="#315C50"
+            colors={['#315C50']}
+          />
+        }
+      >
         <Text style={styles.title}>ZYRA</Text>
 
         <View style={styles.section}>

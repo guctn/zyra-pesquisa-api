@@ -15,6 +15,8 @@ export default function QueryStatus({
   empty,
   emptyMessage,
 }: QueryStatusProps) {
+  const errorMessage = error?.message;
+
   if (isPending) {
     return <ActivityIndicator accessibilityLabel="Carregando" color="#315C50" />;
   }
@@ -22,7 +24,7 @@ export default function QueryStatus({
   if (isError) {
     return (
       <Text accessibilityRole="alert" style={styles.message}>
-        {error?.message ?? 'Não foi possível carregar os dados.'}
+        {errorMessage ?? 'Não foi possível carregar os dados.'}
       </Text>
     );
   }
