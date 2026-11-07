@@ -12,6 +12,7 @@ type SavedLookListProps = {
   isError: boolean;
   error: Error | null;
   onDeleteLook: (lookId: string) => void;
+  deleteFailed: boolean;
 };
 
 export default function SavedLookList({
@@ -20,6 +21,7 @@ export default function SavedLookList({
   isError,
   error,
   onDeleteLook,
+  deleteFailed,
 }: SavedLookListProps) {
   return (
     <>
@@ -30,6 +32,11 @@ export default function SavedLookList({
         empty={looks?.length === 0}
         emptyMessage="Nenhum look salvo."
       />
+      {deleteFailed && (
+        <Text accessibilityRole="alert" style={styles.operationError}>
+          Não foi possível apagar o look.
+        </Text>
+      )}
       {looks?.map((look) => (
         <View key={look.id} style={styles.card}>
           <Text style={styles.title}>{look.nome}</Text>
@@ -79,5 +86,10 @@ const styles = StyleSheet.create({
     color: '#A12A22',
     fontSize: 14,
     fontWeight: '600',
+  },
+  operationError: {
+    color: '#A12A22',
+    fontSize: 14,
+    marginBottom: 12,
   },
 });

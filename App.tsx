@@ -147,6 +147,8 @@ function ListsScreen() {
   }
 
   function saveLook() {
+    saveLookMutation.reset();
+
     if (selectedPieceIds.length === 0) {
       setShowEmptySelectionMessage(true);
       return;
@@ -198,6 +200,11 @@ function ListsScreen() {
               Escolha pelo menos uma peça
             </Text>
           )}
+          {saveLookMutation.isError && (
+            <Text accessibilityRole="alert" style={styles.operationError}>
+              Não foi possível salvar o look.
+            </Text>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -207,7 +214,11 @@ function ListsScreen() {
             isPending={looksQuery.isPending}
             isError={looksQuery.isError}
             error={looksQuery.error}
-            onDeleteLook={(lookId) => deleteLookMutation.mutate(lookId)}
+            onDeleteLook={(lookId) => {
+              deleteLookMutation.reset();
+              deleteLookMutation.mutate(lookId);
+            }}
+            deleteFailed={deleteLookMutation.isError}
           />
         </View>
       </ScrollView>
@@ -260,6 +271,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   selectionMessage: {
+    color: '#A12A22',
+    fontSize: 14,
+    marginTop: 8,
+  },
+  operationError: {
     color: '#A12A22',
     fontSize: 14,
     marginTop: 8,
