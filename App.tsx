@@ -166,6 +166,8 @@ function ListsScreen() {
           <RefreshControl
             refreshing={looksQuery.isRefetching}
             onRefresh={() => {
+              saveLookMutation.reset();
+              deleteLookMutation.reset();
               void looksQuery.refetch();
             }}
             tintColor="#315C50"
@@ -174,6 +176,11 @@ function ListsScreen() {
         }
       >
         <Text style={styles.title}>ZYRA</Text>
+        {looksQuery.dataUpdatedAt > 0 && (
+          <Text style={styles.updatedAt}>
+            Atualizado às {new Date(looksQuery.dataUpdatedAt).toLocaleTimeString('pt-BR')}
+          </Text>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Minhas peças</Text>
@@ -249,6 +256,11 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     fontSize: 21,
     fontWeight: '700',
+    marginBottom: 12,
+  },
+  updatedAt: {
+    color: '#64748B',
+    fontSize: 13,
     marginBottom: 12,
   },
   saveButton: {
