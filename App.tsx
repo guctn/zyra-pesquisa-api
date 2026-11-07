@@ -16,7 +16,10 @@ const queryClient = new QueryClient();
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const apiToken = process.env.EXPO_PUBLIC_API_TOKEN;
 
-async function getFromApi<T>(path: string): Promise<T> {
+async function requestApi<T>(
+  path: string,
+  options: { method?: 'POST' | 'DELETE'; body?: unknown } = {},
+): Promise<T> {
   if (!apiUrl) {
     throw new Error('Defina EXPO_PUBLIC_API_URL em .env.local.');
   }
@@ -26,36 +29,13 @@ async function getFromApi<T>(path: string): Promise<T> {
   }
 
   const response = await fetch(`${apiUrl.replace(/\/+$/, '')}${path}`, {
+    method: options.method,
     headers: {
       Accept: 'application/json',
       Authorization: `Bearer ${apiToken}`,
+      ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
-  });
-
-  if (!response.ok) {
-    throw new Error(`A solicitação falhou (HTTP ${response.status}).`);
-  }
-
-  return (await response.json()) as T;
-}
-
-async function postToApi<T>(path: string, body: unknown): Promise<T> {
-  if (!apiUrl) {
-    throw new Error('Defina EXPO_PUBLIC_API_URL em .env.local.');
-  }
-
-  if (!apiToken) {
-    throw new Error('Defina EXPO_PUBLIC_API_TOKEN em .env.local.');
-  }
-
-  const response = await fetch(`${apiUrl.replace(/\/+$/, '')}${path}`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiToken}`,
-    },
-    body: JSON.stringify(body),
+    ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
   });
 
   if (!response.ok) {
@@ -78,20 +58,30 @@ function ListsScreen() {
   const [selectedPieceIds, setSelectedPieceIds] = useState<string[]>([]);
   const piecesQuery = useQuery({
     queryKey: ['pecas'],
-    queryFn: () => getFromApi<Piece[]>('/pecas'),
+    queryFn: () => requestApi<Piece[]>('/pecas'),
   });
   const looksQuery = useQuery({
     queryKey: ['looks'],
-    queryFn: () => getFromApi<SavedLook[]>('/looks'),
+    queryFn: () => requestApi<SavedLook[]>('/looks'),
   });
   const saveLookMutation = useMutation({
     mutationFn: (pecaIds: string[]) =>
-      postToApi<SavedLook>('/looks', {
-        pecaIds,
-        nome: `Look com ${pecaIds.length} peças`,
+      requestApi<SavedLook>('/looks', {
+        method: 'POST',
+        body: {
+          pecaIds,
+          nome: `Look com ${pecaIds.length} peças`,
+        },
       }),
     onSuccess: async () => {
       setSelectedPieceIds([]);
+      await queryClient.invalidateQueries({ queryKey: ['looks'] });
+    },
+  });
+  const deleteLookMutation = useMutation({
+    mutationFn: (lookId: string) =>
+      requestApi<{ message: string }>(`/looks/${lookId}`, { method: 'DELETE' }),
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['looks'] });
     },
   });
@@ -137,6 +127,7 @@ function ListsScreen() {
             isPending={looksQuery.isPending}
             isError={looksQuery.isError}
             error={looksQuery.error}
+            onDeleteLook={(lookId) => deleteLookMutation.mutate(lookId)}
           />
         </View>
       </ScrollView>
