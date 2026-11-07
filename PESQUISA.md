@@ -6,6 +6,20 @@ O ZYRA é um aplicativo mobile que ajuda pessoas com daltonismo a identificar co
 ## Pergunta de pesquisa
 Como o @tanstack/react-query permite listar, salvar e apagar os looks do ZYRA (GET/POST/DELETE /looks) de forma que a lista se atualize sozinha depois de cada alteração e o app continue utilizável quando o back fica fora do ar?
 
+### Revisão de colega (exercício 2)
+Mostrei a pergunta para a Sophia, que apontou quatro pontos vagos. Cada um foi resolvido pelos critérios do `CRITERIOS.md`:
+
+| O que ela achou vago | Como a PoC definiu |
+|----------------------|--------------------|
+| "A lista se atualize sozinha": depois de salvar ou apagar, ao voltar para a tela ou com mudanças de outros usuários? | Depois de cada operação bem-sucedida de salvar ou apagar (critérios 2 e 3). Mudanças de outros usuários ficam fora |
+| "O app continue utilizável": só ver os looks carregados ou também salvar e apagar sem o back? | Só ver a última lista carregada. Salvar e apagar mostram erro e não mudam a lista (critérios 5 e 6) |
+| "Back fora do ar": falha do servidor ou celular sem internet? | Falha do servidor com o celular conectado. São situações diferentes, como registrei no mapa do tema |
+| O que acontece quando uma operação falha? | O look continua na lista e aparece a mensagem de que a operação não foi concluída (critério 6) |
+
+A observação principal dela foi escolher entre offline básico (ver o que já foi carregado) e offline completo (salvar e apagar sem conexão e sincronizar depois). A PoC ficou no offline básico, que é o que o React Query oferece sem plugin de persistência. A versão que ela sugeriu deixa isso explícito:
+
+> Como o @tanstack/react-query pode ser utilizado para listar, salvar e apagar os looks do ZYRA (GET/POST/DELETE /looks), garantindo que a lista seja atualizada após cada operação bem-sucedida e que os looks já carregados continuem disponíveis para visualização quando o backend estiver temporariamente indisponível?
+
 ## Alternativas consideradas
 | Opção | Serve para | Funciona no Expo Go | Decisão |
 |-------|------------|---------------------|---------|
