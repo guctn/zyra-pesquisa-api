@@ -65,6 +65,12 @@ Observações:
 - A página do Expo sobre MCP (https://docs.expo.dev/eas/ai/mcp/) diz que a busca na documentação "requires an Expo Services paid plan", mas a busca funcionou com a minha conta gratuita.
 - A ferramenta "Read Expo Documentation Page" não se limita ao site do Expo: no pedido do plano de implementação, ela leu páginas do tanstack.com (Mutations, Query Invalidation e Query Retries).
 
+## Alteração pequena (exercício 9)
+- Pedido: mostrar "Minhas peças" em quadrados, 3 por linha, com a miniatura (`imagemMiniUrl`), a categoria e o nome da cor, usando o `Image` do React Native, sem instalar pacote.
+- Resultado: o diff mudou só `components/PieceList.tsx`, sem dependência nova; lint e typecheck passaram.
+- Precisou de um segundo pedido, só visual: na primeira versão a imagem ficava espremida dentro de um cartão quadrado; na segunda, a miniatura é quadrada e ocupa a largura do cartão, com o texto abaixo. De novo só `components/PieceList.tsx` mudou.
+- Mantive o nome da cor escrito abaixo da imagem: para quem tem daltonismo, a foto sozinha não basta.
+
 ## Onde a IA errou
 
 ### 1. ChatGPT afirmou ter conferido tudo
