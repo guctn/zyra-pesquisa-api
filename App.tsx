@@ -56,6 +56,7 @@ export default function App() {
 function ListsScreen() {
   const queryClient = useQueryClient();
   const [selectedPieceIds, setSelectedPieceIds] = useState<string[]>([]);
+  const [showEmptySelectionMessage, setShowEmptySelectionMessage] = useState(false);
   const piecesQuery = useQuery({
     queryKey: ['pecas'],
     queryFn: () => requestApi<Piece[]>('/pecas'),
@@ -75,6 +76,7 @@ function ListsScreen() {
       }),
     onSuccess: async () => {
       setSelectedPieceIds([]);
+      setShowEmptySelectionMessage(false);
       await queryClient.invalidateQueries({ queryKey: ['looks'] });
     },
   });
@@ -87,11 +89,24 @@ function ListsScreen() {
   });
 
   function togglePieceSelection(pieceId: string) {
+    if (!selectedPieceIds.includes(pieceId)) {
+      setShowEmptySelectionMessage(false);
+    }
+
     setSelectedPieceIds((currentIds) =>
       currentIds.includes(pieceId)
         ? currentIds.filter((id) => id !== pieceId)
         : [...currentIds, pieceId],
     );
+  }
+
+  function saveLook() {
+    if (selectedPieceIds.length === 0) {
+      setShowEmptySelectionMessage(true);
+      return;
+    }
+
+    saveLookMutation.mutate(selectedPieceIds);
   }
 
   return (
@@ -112,13 +127,20 @@ function ListsScreen() {
           />
         </View>
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => saveLookMutation.mutate(selectedPieceIds)}
-          style={({ pressed }) => [styles.saveButton, pressed && styles.saveButtonPressed]}
-        >
-          <Text style={styles.saveButtonText}>Salvar look</Text>
-        </Pressable>
+        <View style={styles.saveAction}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={saveLook}
+            style={({ pressed }) => [styles.saveButton, pressed && styles.saveButtonPressed]}
+          >
+            <Text style={styles.saveButtonText}>Salvar look</Text>
+          </Pressable>
+          {showEmptySelectionMessage && selectedPieceIds.length === 0 && (
+            <Text accessibilityRole="alert" style={styles.selectionMessage}>
+              Escolha pelo menos uma peça
+            </Text>
+          )}
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Looks salvos</Text>
@@ -175,5 +197,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  saveAction: {
+    marginBottom: 28,
+  },
+  selectionMessage: {
+    color: '#A12A22',
+    fontSize: 14,
+    marginTop: 8,
   },
 });
