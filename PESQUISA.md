@@ -115,5 +115,11 @@ Observações:
 - Como percebi: `git status` e `git diff` mostraram `index.ts` alterado e o ESLint sumindo do `package.json`.
 - O certo: o `AGENTS.md` manda rodar `npx expo lint` antes de terminar, então o ESLint precisa ficar; e o pedido não envolvia o `index.ts`. Depois de eu apontar, ele reinstalou o ESLint e restaurou o `index.ts`.
 
+### 9. Copilot adivinhou o texto do erro de rede
+- Pedido: mostrar em português a mensagem de erro quando o back está fora do ar (critério 5).
+- O que veio: uma comparação com os textos fixos "Network request failed" e "Failed to fetch" para decidir quando traduzir.
+- Como percebi: testando no iPhone com o back desligado, a mensagem apareceu em inglês: "fetch failed: Could not connect to the server". O texto real não era nenhum dos dois.
+- O certo: não depender do texto do erro; qualquer falha lançada pelo `fetch` (que não seja timeout nem cancelamento) vira "Não foi possível conectar ao servidor". Só o teste no aparelho revelou o problema: lint e typecheck passavam.
+
 ## Resultado e próximos passos no TCC
 - [o que a prova de conceito demonstrou e o que muda no TCC]
